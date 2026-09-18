@@ -1,0 +1,171 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="description" content="AI-powered bike rental demand prediction dashboard" />
+  <title>RidePulse — Bike Demand Predictor</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Space+Grotesk:wght@600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/static/styles.css" />
+</head>
+<body>
+  <div class="ambient ambient-one"></div>
+  <div class="ambient ambient-two"></div>
+
+  <header class="site-header">
+    <a class="brand" href="#">
+      <span class="brand-mark">R</span>
+      <span>RidePulse</span>
+    </a>
+    <div class="status-pill"><span></span> ML Model Ready</div>
+  </header>
+
+  <main class="page-shell">
+    <section class="hero">
+      <div>
+        <p class="eyebrow">SMART MOBILITY • DEMAND FORECASTING</p>
+        <h1>Know the rush<br><span>before it arrives.</span></h1>
+        <p class="hero-copy">Forecast hourly bike rental demand from weather, time and calendar conditions using a tuned LightGBM model.</p>
+        <div class="hero-tags">
+          <span>⚡ Instant prediction</span>
+          <span>🧠 Machine learning</span>
+          <span>📈 Demand intelligence</span>
+        </div>
+      </div>
+      <div class="hero-orbit" aria-hidden="true">
+        <div class="orbit-ring"></div>
+        <div class="bike-icon">🚲</div>
+        <div class="orbit-card orbit-card-a"><strong>24h</strong><span>Hourly insights</span></div>
+        <div class="orbit-card orbit-card-b"><strong>11</strong><span>Input signals</span></div>
+      </div>
+    </section>
+
+    <section class="dashboard-grid">
+      <form class="glass-card form-card" id="prediction-form">
+        <div class="card-heading">
+          <div>
+            <p class="section-kicker">Prediction inputs</p>
+            <h2>Set ride conditions</h2>
+          </div>
+          <button class="reset-button" type="button" id="reset-button">Reset</button>
+        </div>
+
+        <div class="form-grid">
+          <label class="field">
+            <span>Year</span>
+            <select id="year" name="year">
+              <option value="2011">2011</option>
+              <option value="2012" selected>2012</option>
+            </select>
+          </label>
+
+          <label class="field">
+            <span>Month</span>
+            <select id="month" name="month"></select>
+          </label>
+
+          <label class="field">
+            <span>Hour</span>
+            <select id="hour" name="hour"></select>
+          </label>
+
+          <label class="field">
+            <span>Weekday</span>
+            <select id="weekday" name="weekday"></select>
+          </label>
+
+          <label class="field">
+            <span>Season</span>
+            <select id="season" name="season">
+              <option>Springer</option>
+              <option selected>Summer</option>
+              <option>Fall</option>
+              <option>Winter</option>
+            </select>
+          </label>
+
+          <label class="field">
+            <span>Weather</span>
+            <select id="weather" name="weather">
+              <option selected>Clear</option>
+              <option>Mist</option>
+              <option>Light Snow</option>
+              <option>Heavy Rain</option>
+            </select>
+          </label>
+        </div>
+
+        <div class="toggle-row">
+          <label class="toggle-card">
+            <input type="checkbox" id="working_day" checked />
+            <span class="toggle-ui"></span>
+            <span><strong>Working day</strong><small>Regular business day</small></span>
+          </label>
+          <label class="toggle-card">
+            <input type="checkbox" id="holiday" />
+            <span class="toggle-ui"></span>
+            <span><strong>Holiday</strong><small>Public holiday</small></span>
+          </label>
+        </div>
+
+        <div class="slider-stack">
+          <div class="slider-field">
+            <div class="slider-label"><span>Temperature</span><output id="temperature-value">0.50</output></div>
+            <input type="range" id="temperature" min="0" max="1" value="0.5" step="0.01" />
+          </div>
+          <div class="slider-field">
+            <div class="slider-label"><span>Humidity</span><output id="humidity-value">0.50</output></div>
+            <input type="range" id="humidity" min="0" max="1" value="0.5" step="0.01" />
+          </div>
+          <div class="slider-field">
+            <div class="slider-label"><span>Windspeed</span><output id="windspeed-value">0.20</output></div>
+            <input type="range" id="windspeed" min="0" max="1" value="0.2" step="0.01" />
+          </div>
+        </div>
+
+        <p class="helper-text">Weather measurements use the same normalized 0–1 scale as the model training data.</p>
+
+        <button class="predict-button" id="predict-button" type="submit">
+          <span class="button-label">Predict demand</span>
+          <span class="button-arrow">→</span>
+        </button>
+      </form>
+
+      <aside class="result-column">
+        <section class="glass-card result-card" id="result-card">
+          <p class="section-kicker">Forecast result</p>
+          <div class="result-empty" id="result-empty">
+            <div class="result-icon">↗</div>
+            <h3>Your forecast appears here</h3>
+            <p>Choose the conditions and run a prediction to estimate rental demand.</p>
+          </div>
+          <div class="result-content hidden" id="result-content">
+            <div class="demand-badge" id="demand-badge">Moderate demand</div>
+            <p class="result-label">Predicted bike rentals</p>
+            <div class="prediction-number"><span id="prediction-number">0</span><small>bikes</small></div>
+            <div class="meter"><div id="meter-fill"></div></div>
+            <p class="result-message" id="result-message"></p>
+            <div class="result-details">
+              <div><span>Model</span><strong>LightGBM</strong></div>
+              <div><span>Prediction</span><strong id="raw-prediction">0.00</strong></div>
+            </div>
+          </div>
+        </section>
+
+        <section class="info-card">
+          <div class="info-icon">✦</div>
+          <div>
+            <strong>How it works</strong>
+            <p>Your inputs are sent to a FastAPI endpoint, transformed into the model's trained feature layout, then scored in real time.</p>
+          </div>
+        </section>
+      </aside>
+    </section>
+  </main>
+
+  <footer>RidePulse • Bike Rental Demand Prediction • FastAPI + LightGBM</footer>
+  <script src="/static/app.js"></script>
+</body>
+</html>
